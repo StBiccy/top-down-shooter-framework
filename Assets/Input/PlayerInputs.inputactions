@@ -1,5 +1,5 @@
 {
-    "name": "player",
+    "name": "PlayerInputs",
     "maps": [
         {
             "name": "Player",
@@ -15,9 +15,36 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "MeleeAttack",
+                    "type": "Button",
+                    "id": "71d12e33-e2d1-4300-b75a-588602047de9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Shoot",
                     "type": "Button",
                     "id": "3878f4d4-2f3b-497b-903d-5d83cfa81a05",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Reload",
+                    "type": "Button",
+                    "id": "070600e8-5386-4fc0-929b-70471b0ba599",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwapWeapon",
+                    "type": "Button",
+                    "id": "b01987aa-252c-46be-be3d-5f0ed4c56da3",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -146,22 +173,11 @@
                 },
                 {
                     "name": "",
-                    "id": "516cc0da-70b1-4f2a-bf61-8d8c2b380d6d",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Shoot",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "ab7e7979-78c7-4838-8bbb-075171e9bf02",
-                    "path": "<Keyboard>/space",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Keyboard&Mouse",
                     "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -174,6 +190,39 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "MousePos",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7ca19544-dbdb-46ea-9adc-ce6ee8488bb6",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "SwapWeapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d33b720d-43db-41c2-99f0-f3b890b4c638",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Reload",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "75052400-219a-4bcd-8f6f-f63ea182f8dd",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "MeleeAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
