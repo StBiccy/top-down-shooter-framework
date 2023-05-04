@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     private short hitPoints;
     private Vector2 direction;
     private Vector2 mouseWorldPos;
+    private Vector2 mouseLocalPos;
     private Rigidbody2D rb;
 
     [Header("Guns")]
@@ -49,6 +50,7 @@ public class PlayerController : MonoBehaviour
             currentGun = GetComponent<Pistol>() as IWeapon;
             gunText.GetComponent<TMP_Text>().SetText("Pistol");
         }
+
     }
 
     private void Start()
@@ -61,7 +63,7 @@ public class PlayerController : MonoBehaviour
     {
         rb.velocity = direction * speed;
 
-
+        mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseLocalPos);
         Vector2 facingDiretion = mouseWorldPos - (Vector2)transform.position;
         float angle = Mathf.Atan2(facingDiretion.y,facingDiretion.x) * Mathf.Rad2Deg;
         rb.MoveRotation(angle);
@@ -74,7 +76,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnMousePos(InputAction.CallbackContext context)
     {
-        mouseWorldPos = Camera.main.ScreenToWorldPoint(context.ReadValue<Vector2>());
+        mouseLocalPos = context.ReadValue<Vector2>();
+        mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseLocalPos);
     }
 
     public void OnWeaponSwap(InputAction.CallbackContext context)
@@ -104,7 +107,6 @@ public class PlayerController : MonoBehaviour
         {
             currentGun.FireGun();
             AmmoTextUpdate();
-            
         }
     }
 
@@ -133,7 +135,7 @@ public class PlayerController : MonoBehaviour
 
     private void HealthTextUpdate()
     {
-        hitPointText.GetComponent<TMP_Text>().SetText(hitPoints + " / " + baseHitPoints);
+        hitPointText.GetComponent<TMP_Text>().SetText("HP: " + hitPoints + " / " + baseHitPoints);
     }
 
     private IEnumerator KinfeCoolDown()
