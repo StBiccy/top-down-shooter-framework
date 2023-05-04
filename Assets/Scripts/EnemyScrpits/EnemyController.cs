@@ -71,7 +71,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         {
             if (healthDebugText.activeSelf)
             {
-                if (healthDebugText.activeSelf) ;
+                healthDebugText.SetActive(false);
             }
         }
     }
