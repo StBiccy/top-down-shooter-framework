@@ -9,7 +9,7 @@ public class Knife : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            collision.gameObject.GetComponent<IDamageable>().Hit(damage, IDamageable.hitType.knife);
+            collision.gameObject.GetComponent<IDamageable>().Hit(damage, IDamageable.hitType.knife, transform.parent.gameObject);
         }
     }
 }

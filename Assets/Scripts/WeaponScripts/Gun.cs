@@ -53,7 +53,7 @@ public class Gun : MonoBehaviour, IWeapon
                 #region debug
                 if (hit && hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
                 {
-                    hit.collider.GetComponent<IDamageable>().Hit(damage, IDamageable.hitType.gun);
+                    hit.collider.GetComponent<IDamageable>().Hit(damage, IDamageable.hitType.gun, gameObject);
                 }
 
                 if (drawHitPoint)
@@ -76,13 +76,13 @@ public class Gun : MonoBehaviour, IWeapon
 
     public float ReloadGun()
     {
-        if (magBullets >= magSize || bullets <= 0)
+        if (magBullets >= magSize || bullets <= 0 || reloading)
         {
             return 0;
         }
-        else if (bullets >= magSize)
+        else if (bullets >= magSize - magBullets)
         {
-            bullets -= (uint) magSize- magBullets;
+            bullets -= (uint) magSize - magBullets;
             magBullets = magSize;
             StartCoroutine(Relaod());
             return reloadSpeed;
@@ -113,8 +113,14 @@ public class Gun : MonoBehaviour, IWeapon
 
     private IEnumerator Relaod()
     {
+        reloading = true;
         yield return new WaitForSeconds(reloadSpeed);
         reloading = false;
+    }
+
+    public void AddMag()
+    {
+        bullets += magSize;
     }
 
     public uint GetBullets() { return bullets;}

@@ -11,5 +11,5 @@ public interface IDamageable
         enemy,
     }
 
-    void Hit(short damage, hitType type);
+    void Hit(short damage, hitType type, GameObject deltBy);
 }

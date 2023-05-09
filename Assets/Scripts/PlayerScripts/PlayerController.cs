@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using static IDamageable;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
     enum gun
-    { 
+    {
         pistol,
         shotGun,
     }
@@ -15,11 +18,18 @@ public class PlayerController : MonoBehaviour
     [Header("Player Values")]
     [SerializeField] private short baseHitPoints;
     [SerializeField] private float speed = 5;
+    [SerializeField] private uint points;
     private short hitPoints;
     private Vector2 direction;
     private Vector2 mouseWorldPos;
     private Vector2 mouseLocalPos;
     private Rigidbody2D rb;
+
+    [SerializeField] private float immuneTime;
+    private bool immune = false;
+
+    private GameObject interactionObject;
+
 
     [Header("Guns")]
     [SerializeField] private gun gunSelect;
@@ -27,13 +37,15 @@ public class PlayerController : MonoBehaviour
 
     [Header("Knife")]
     [SerializeField] private GameObject knifeObject;
-    [SerializeField, Range(0,2)] private float knifeCD;
+    [SerializeField, Range(0, 2)] private float knifeCD;
     private bool knifeWait = false;
 
     [Header("UI")]
-    [SerializeField] private GameObject gunText;
-    [SerializeField] private GameObject ammoText;
-    [SerializeField] private GameObject hitPointText;
+    [SerializeField] private TMP_Text gunText;
+    [SerializeField] private TMP_Text ammoText;
+    [SerializeField] private TMP_Text hitPointText;
+    [SerializeField] private TMP_Text pointText;
+    [SerializeField] private GameObject deathScreen;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>(); 
@@ -43,12 +55,12 @@ public class PlayerController : MonoBehaviour
         if (gunSelect == gun.shotGun)
         {
             currentGun = GetComponent<ShotGun>() as IWeapon;
-            gunText.GetComponent<TMP_Text>().SetText("Shot Gun");
+            gunText.SetText("Shot Gun");
         }
         else if (gunSelect == gun.pistol)
         {
             currentGun = GetComponent<Pistol>() as IWeapon;
-            gunText.GetComponent<TMP_Text>().SetText("Pistol");
+            gunText.SetText("Pistol");
         }
 
     }
@@ -57,6 +69,7 @@ public class PlayerController : MonoBehaviour
     {
         AmmoTextUpdate();
         HealthTextUpdate();
+        PointTextUpdate();
     }
 
     private void FixedUpdate()
@@ -90,12 +103,12 @@ public class PlayerController : MonoBehaviour
             {
                 gunSelect = 0;
                 currentGun = GetComponent<Pistol>();
-                gunText.GetComponent<TMP_Text>().SetText("Pistol");
+                gunText.SetText("Pistol");
             }
             else if ((int)gunSelect == 1)
             {
                 currentGun = GetComponent<ShotGun>();
-                gunText.GetComponent<TMP_Text>().SetText("Shot Gun");
+                gunText.SetText("Shot Gun");
             }
             AmmoTextUpdate();
         }
@@ -128,14 +141,117 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if(context.performed && interactionObject != null) 
+        {
+            interactionObject.GetComponent<IInteractable>().Interact(gameObject);
+        }
+    }
+
+    public void OnReset(InputAction.CallbackContext context)
+    {
+        if(context.performed) 
+        {
+            Time.timeScale= 1.0f;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+    }
+
+    public void AddPoints(uint val)
+    {
+        points += val;
+        PointTextUpdate();
+    }
+
+    public void RemovePoints(uint val) 
+    { 
+        points -= val; 
+        PointTextUpdate();
+    }
+
+    public uint GetPoints() { return points; }
+
+    public void Heal()
+    {
+        hitPoints = baseHitPoints;
+        HealthTextUpdate();
+    }
+
+    public void AddShotgunMag()
+    {
+        GetComponent<ShotGun>().AddMag();
+        AmmoTextUpdate();
+    }
+
+    public void AddPistolMag()
+    {
+        GetComponent<Pistol>().AddMag();
+        AmmoTextUpdate();
+    }
+
     private void AmmoTextUpdate()
     {
-        ammoText.GetComponent<TMP_Text>().SetText(currentGun.GetMagBullets() + " / " + currentGun.GetBullets());
+        ammoText.SetText(currentGun.GetMagBullets() + " / " + currentGun.GetBullets());
     }
 
     private void HealthTextUpdate()
     {
-        hitPointText.GetComponent<TMP_Text>().SetText("HP: " + hitPoints + " / " + baseHitPoints);
+        hitPointText.SetText("HP: " + hitPoints + " / " + baseHitPoints);
+    }
+
+    private void PointTextUpdate()
+    {
+       pointText.SetText("Points: " + points);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.layer == LayerMask.NameToLayer("Interactable"))
+        {
+            interactionObject = collision.gameObject;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Interactable"))
+        {
+            interactionObject = null;
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        {
+            Hit(1, IDamageable.hitType.enemy, collision.gameObject);
+        }
+    }
+
+    public void Hit(short damage, hitType type, GameObject deltBy)
+    {
+        if (!immune)
+        {
+            hitPoints -= damage;
+            HealthTextUpdate();
+            if (hitPoints <= 0)
+            {
+                deathScreen.SetActive(true);
+                Time.timeScale = 0.0f;
+            }
+            else
+            {
+                immune = true;
+                StartCoroutine(DamageImmunity());
+            }
+        }
+
+    }
+    private IEnumerator DamageImmunity()
+    {
+        yield return new WaitForSeconds(immuneTime);
+        immune = false;
     }
 
     private IEnumerator KinfeCoolDown()

@@ -14,6 +14,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Enemy Values")]
     [SerializeField] private short baseHitPoints = 10;
     [SerializeField] private float knifeImmunityTime;
+    [SerializeField] private uint pointsWorth;
     private bool canKnife = true;
     private short hitPoints;
 
@@ -35,7 +36,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         HealthDebug();
     }
 
-    public void Hit(short damage, IDamageable.hitType type)
+    public void Hit(short damage, IDamageable.hitType type, GameObject deltBy)
     {
         if (type == IDamageable.hitType.knife )
         {
@@ -43,18 +44,25 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 hitPoints -= damage;
                 canKnife = false;
+                if (hitPoints <= 0)
+                {
+                    deltBy.GetComponent<PlayerController>().AddPoints(pointsWorth*2);
+                    Destroy(gameObject);
+                }
                 StartCoroutine(KnifeHitImmunity());
             }
         }
         else
         {
             hitPoints -= damage;
+            if (hitPoints <= 0)
+            {
+                deltBy.GetComponent<PlayerController>().AddPoints(pointsWorth);
+                Destroy(gameObject);
+            }
         }
 
-        if (hitPoints < 0)
-        {
-            Destroy(gameObject);
-        }
+
     }
 
     private void HealthDebug()
@@ -81,5 +89,10 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         yield return new WaitForSeconds(knifeImmunityTime);
         canKnife = true;
+    }
+
+    public void SetPTransform(Transform transform)
+    {
+        player = transform;
     }
 }
