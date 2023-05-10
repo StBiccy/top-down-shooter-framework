@@ -6,6 +6,11 @@ using UnityEngine.InputSystem;
 
 public class Gun : MonoBehaviour, IWeapon
 {
+    [Header("ParticleSystem")]
+    [SerializeField] private ParticleSystem muzzelFlash;
+    [SerializeField] private GameObject blood;
+    [SerializeField] private GameObject wallDust;
+
     [Header("Firing Parameters")]
     [SerializeField] protected float distance;
     [SerializeField] protected float spread;
@@ -44,6 +49,9 @@ public class Gun : MonoBehaviour, IWeapon
         if (magBullets > 0 && !fireCD && !reloading)
         {
             --magBullets;
+
+            muzzelFlash.Play();
+
             for (int i = 0; i < numProjectiles; i++)
             {
                 Vector3 fireDir = Quaternion.Euler(0, 0, transform.rotation.z + UnityEngine.Random.Range(-spread, spread)) * transform.right;
@@ -54,6 +62,11 @@ public class Gun : MonoBehaviour, IWeapon
                 if (hit && hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
                 {
                     hit.collider.GetComponent<IDamageable>().Hit(damage, IDamageable.hitType.gun, gameObject);
+                    Instantiate(blood, hit.transform.position, Quaternion.identity);
+                }
+                else if (hit && hit.collider.gameObject.layer == LayerMask.NameToLayer("Walls"))
+                {
+                    Instantiate(wallDust, hit.point, Quaternion.identity);
                 }
 
                 if (drawHitPoint)
