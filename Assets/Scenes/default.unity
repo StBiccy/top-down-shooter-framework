@@ -3120,7 +3120,7 @@ MonoBehaviour:
     m_Bits: 384
   damage: 2
   magSize: 4
-  bullets: 0
+  bullets: 4
   magBullets: 4
   drawRange: 0
   drawBulletLines: 0
@@ -3152,7 +3152,7 @@ MonoBehaviour:
     m_Bits: 384
   damage: 3
   magSize: 7
-  bullets: 100
+  bullets: 14
   magBullets: 7
   drawRange: 0
   drawBulletLines: 0
@@ -3819,7 +3819,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
